@@ -1,5 +1,6 @@
 import { Quiz } from '../models/quiz.model';
 import { Question } from '../models/question.model';
+import { Attempt } from '../models/attempt.model';
 import { AppError } from '../utils/AppError';
 import crypto from 'crypto';
 
@@ -134,4 +135,70 @@ export const deleteQuestion = async (quizId: string, questionId: string, userId:
 
 export const getQuestionsByQuiz = async (quizId: string) => {
   return await Question.find({ quizId }).sort({ timestamp: 1, order: 1 });
+};
+
+// ─── Analytics ───────────────────────────────────────────────
+
+export const submitAttempt = async (quizId: string, data: any) => {
+  const attempt = await Attempt.create({
+    ...data,
+    quizId,
+  });
+  return attempt;
+};
+
+export const getQuizAnalytics = async (quizId: string, userId: string) => {
+  // Verify quiz ownership
+  const quiz = await Quiz.findOne({ _id: quizId, userId });
+  if (!quiz) {
+    throw new AppError('Quiz not found or you do not have permission', 404);
+  }
+
+  const totalViews = await Attempt.countDocuments({ quizId });
+  const completedAttempts = await Attempt.countDocuments({ quizId, completed: true });
+  
+  const completionRate = totalViews > 0 ? (completedAttempts / totalViews) * 100 : 0;
+
+  // Aggregate for average score and watch time
+  const stats = await Attempt.aggregate([
+    { $match: { quizId: quiz._id } },
+    {
+      $group: {
+        _id: null,
+        avgScore: { $avg: '$score' },
+        avgWatchTime: { $avg: '$watchTime' },
+      },
+    },
+  ]);
+
+  const avgScore = stats.length > 0 ? stats[0].avgScore : 0;
+  const avgWatchTime = stats.length > 0 ? stats[0].avgWatchTime : 0;
+
+  // Get attempts for a time series chart (last 30 days)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const dailyViews = await Attempt.aggregate([
+    { 
+      $match: { 
+        quizId: quiz._id,
+        createdAt: { $gte: thirtyDaysAgo }
+      } 
+    },
+    {
+      $group: {
+        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+        views: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  return {
+    totalViews,
+    completionRate,
+    avgScore,
+    avgWatchTime,
+    dailyViews,
+  };
 };

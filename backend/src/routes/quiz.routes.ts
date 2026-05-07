@@ -21,6 +21,9 @@ router
 // Get quiz with all questions (used by the builder)
 router.get('/:id/full', quizController.getQuizWithQuestions);
 
+// Get analytics for a quiz
+router.get('/:id/analytics', quizController.getQuizAnalytics);
+
 // Question sub-routes
 router.post('/:id/questions', quizController.addQuestion);
 router

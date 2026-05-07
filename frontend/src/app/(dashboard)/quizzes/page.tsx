@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '@/lib/axios';
-import { Play, Settings2, Share2, Trash2 } from 'lucide-react';
+import { Play, Settings2, Share2, Trash2, BarChart2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Quiz {
@@ -99,6 +99,9 @@ export default function QuizzesPage() {
                 
                 <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
                   <div className="flex gap-2">
+                    <Link href={`/dashboard/quizzes/${quiz._id}/analytics`} className="p-2 text-zinc-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors" title="Analytics">
+                      <BarChart2 className="w-4 h-4" />
+                    </Link>
                     <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors" title="Edit Quiz">
                       <Settings2 className="w-4 h-4" />
                     </button>

@@ -14,6 +14,13 @@ export default function PlayQuizPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Generate or get viewerId from localStorage
+    let currentViewerId = localStorage.getItem('viewerId');
+    if (!currentViewerId) {
+      currentViewerId = Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('viewerId', currentViewerId);
+    }
+
     const fetchQuiz = async () => {
       try {
         setLoading(true);
@@ -24,7 +31,7 @@ export default function PlayQuizPage() {
         
         const { quiz, questions } = response.data.data;
         reset();
-        setQuizData(quiz, questions);
+        setQuizData(slug, quiz, questions, currentViewerId!);
         setLoading(false);
       } catch (err: any) {
         console.error('Error fetching quiz:', err);

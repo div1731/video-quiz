@@ -63,6 +63,16 @@ export const deleteQuiz = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+export const getQuizAnalytics = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const userId = (req as any).user.id;
+    const analytics = await quizService.getQuizAnalytics(req.params.id as string, userId);
+    res.status(200).json({ status: 'success', data: analytics });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // ─── Question Handlers ───────────────────────────────────────
 
 export const addQuestion = async (req: Request, res: Response, next: NextFunction) => {
