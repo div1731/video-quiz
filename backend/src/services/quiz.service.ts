@@ -47,6 +47,15 @@ export const getQuizWithQuestions = async (quizId: string, userId: string) => {
   return { quiz, questions };
 };
 
+export const getQuizBySlugWithQuestions = async (slug: string) => {
+  const quiz = await Quiz.findOne({ shareUrlSlug: slug, status: 'published' });
+  if (!quiz) {
+    throw new AppError('Quiz not found or is not published', 404);
+  }
+  const questions = await Question.find({ quizId: quiz._id }).sort({ timestamp: 1, order: 1 });
+  return { quiz, questions };
+};
+
 export const updateQuiz = async (quizId: string, userId: string, data: any) => {
   const quiz = await Quiz.findOneAndUpdate(
     { _id: quizId, userId },

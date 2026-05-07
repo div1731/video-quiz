@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
 import quizRoutes from './routes/quiz.routes';
+import playRoutes from './routes/play.routes';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get('/health', (req, res) => {
 // Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/api/play', playRoutes);
 
 // 404 handler
 app.use((req, res, next) => {
