@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import authRoutes from './routes/auth.routes';
+import quizRoutes from './routes/quiz.routes';
 
 const app = express();
 
@@ -18,8 +19,9 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 
-// We will mount routes here later
+// Mount routes
 app.use('/api/auth', authRoutes);
+app.use('/api/quizzes', quizRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

@@ -5,7 +5,7 @@ import { AppError } from '../utils/AppError';
 
 export const signToken = (id: string) => {
   return jwt.sign({ id }, env.JWT_SECRET, {
-    expiresIn: env.JWT_EXPIRES_IN,
+    expiresIn: env.JWT_EXPIRES_IN as any,
   });
 };
 
